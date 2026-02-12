@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from './lib/auth';
+import { verifyTokenEdge } from './lib/auth-edge'; // Use Edge-compatible version
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
@@ -16,8 +16,12 @@ export function middleware(request: NextRequest) {
 
   // Admin-only registration path
   if (pathname === '/register') {
-    const verified = token ? verifyToken(token) : null;
-    if (!verified || !(verified as any).isAdmin) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+    
+    const verified = verifyTokenEdge(token);
+    if (!verified || !verified.isAdmin) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
     return NextResponse.next();
@@ -28,9 +32,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  const verified = verifyToken(token);
+  const verified = verifyTokenEdge(token);
   if (!verified) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    // Clear invalid token
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    response.cookies.delete('token');
+    return response;
   }
 
   return NextResponse.next();
