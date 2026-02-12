@@ -3,12 +3,16 @@ import connectDB from '../../../../../lib/mongodb';
 import Voucher from '../../../../../models/Voucher';
 import { verifyToken } from '../../../../../lib/auth';
 
+// ✅ Next.js 15+ - params is a Promise
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ Better cookie parsing
+    // Await the params
+    const { id } = await params;
+    
+    // Verify admin access
     const cookieHeader = request.headers.get('cookie');
     let token = null;
     
@@ -40,7 +44,7 @@ export async function PUT(
     const data = await request.json();
     
     const voucher = await Voucher.findByIdAndUpdate(
-      params.id,
+      id,
       data,
       { new: true }
     );
@@ -55,12 +59,16 @@ export async function PUT(
   }
 }
 
+// ✅ Next.js 15+ - params is a Promise
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ Better cookie parsing
+    // Await the params
+    const { id } = await params;
+    
+    // Verify admin access
     const cookieHeader = request.headers.get('cookie');
     let token = null;
     
@@ -89,7 +97,7 @@ export async function DELETE(
     }
 
     await connectDB();
-    await Voucher.findByIdAndDelete(params.id);
+    await Voucher.findByIdAndDelete(id);
     
     return NextResponse.json({ message: 'Voucher deleted successfully' });
   } catch (error) {

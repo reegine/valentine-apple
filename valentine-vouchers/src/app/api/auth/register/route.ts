@@ -7,21 +7,32 @@ import { verifyToken } from '../../../../../lib/auth';
 export async function POST(request: Request) {
   try {
     // Verify admin access
-    // const token = request.headers.get('cookie')?.split('token=')[1]?.split(';')[0];
-    // if (!token) {
-    //   return NextResponse.json(
-    //     { error: 'Unauthorized' },
-    //     { status: 401 }
-    //   );
-    // }
+    const cookieHeader = request.headers.get('cookie');
+    let token = null;
+    
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';').reduce((acc: any, cookie) => {
+        const [key, value] = cookie.trim().split('=');
+        acc[key] = value;
+        return acc;
+      }, {});
+      token = cookies.token;
+    }
 
-    // const verified = verifyToken(token);
-    // if (!verified || !(verified as any).isAdmin) {
-    //   return NextResponse.json(
-    //     { error: 'Unauthorized' },
-    //     { status: 401 }
-    //   );
-    // }
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No token' },
+        { status: 401 }
+      );
+    }
+
+    const verified = verifyToken(token);
+    if (!verified || !(verified as any).isAdmin) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin only' },
+        { status: 401 }
+      );
+    }
 
     await connectDB();
     const { username, password, isAdmin } = await request.json();
@@ -50,6 +61,7 @@ export async function POST(request: Request) {
       }
     });
   } catch (error) {
+    console.error('Registration error:', error);
     return NextResponse.json(
       { error: 'Registration failed' },
       { status: 500 }
