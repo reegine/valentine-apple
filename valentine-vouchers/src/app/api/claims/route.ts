@@ -1,3 +1,4 @@
+// valentine-apple\valentine-vouchers\src\app\api\claims\route.ts
 import { NextResponse } from 'next/server';
 import connectDB from '../../../../lib/mongodb';
 import Claim from '../../../../models/Claim';
@@ -128,11 +129,20 @@ export async function POST(request: Request) {
 
     if (claimsCount >= voucher.claimLimit) {
       return NextResponse.json(
-        { error: 'Claim limit reached' },
+        { error: 'Claim limit reached for this voucher' },
         { status: 400 }
       );
     }
 
+    // Check if total claims across all users has reached the limit
+    if (voucher.totalClaims >= voucher.claimLimit) {
+      return NextResponse.json(
+        { error: 'Voucher has reached its maximum claims' },
+        { status: 400 }
+      );
+    }
+
+    // Create the claim
     const claim = await Claim.create({
       voucher: voucherId,
       user: userId,
@@ -140,10 +150,24 @@ export async function POST(request: Request) {
       status: evidenceImage ? 'pending' : 'approved'
     });
 
-    // Populate the voucher data before returning
+    // After creating the claim, update voucher and get the updated document
+    const updatedVoucher = await Voucher.findByIdAndUpdate(
+      voucherId,
+      { 
+        $inc: { totalClaims: 1 },
+        $addToSet: { claimedBy: userId }
+      },
+      { new: true } // This returns the updated document
+    );
+
+    // Populate the claim with the updated voucher
     const populatedClaim = await Claim.findById(claim._id).populate('voucher');
 
-    return NextResponse.json(populatedClaim);
+    // Return both the claim and the updated voucher
+    return NextResponse.json({
+      claim: populatedClaim,
+      updatedVoucher: updatedVoucher
+    });
   } catch (error) {
     console.error('Error claiming voucher:', error);
     return NextResponse.json(

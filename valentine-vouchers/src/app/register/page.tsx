@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { User, Lock, Shield } from 'lucide-react';
 import HeartBackground from '../../../components/HeartBackground'; 
 
-// Define schema WITHOUT .default(false) – isAdmin is now required
 const registrationFormSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -19,7 +18,6 @@ const registrationFormSchema = z.object({
   path: ["confirmPassword"],
 });
 
-// Infer the type – now isAdmin is required (boolean)
 type RegistrationFormData = z.infer<typeof registrationFormSchema>;
 
 export default function RegisterPage() {
@@ -34,7 +32,7 @@ export default function RegisterPage() {
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationFormSchema),
     defaultValues: {
-      isAdmin: false, // Provide default value here
+      isAdmin: false,
     },
   });
 
@@ -66,118 +64,188 @@ export default function RegisterPage() {
   return (
     <>
       <HeartBackground />
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-xl border border-pink-200">
-          <div>
-            <div className="flex justify-center">
-              <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-3 rounded-full">
-                <Shield className="h-8 w-8 text-white" />
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12">
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+          
+          .romantic-card {
+            font-family: 'Crimson Text', serif;
+            animation: floatIn 0.8s ease-out;
+          }
+          
+          .romantic-title {
+            font-family: 'Playfair Display', serif;
+          }
+          
+          @keyframes floatIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          @keyframes pulse-glow {
+            0%, 100% { 
+              box-shadow: 0 0 20px rgba(251, 113, 133, 0.3);
+            }
+            50% { 
+              box-shadow: 0 0 30px rgba(251, 113, 133, 0.5);
+            }
+          }
+          
+          .shield-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+          }
+          
+          .input-field {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          
+          .input-field:focus {
+            transform: translateY(-2px);
+          }
+          
+          .checkbox-custom {
+            transition: all 0.2s ease;
+          }
+          
+          .checkbox-custom:checked {
+            transform: scale(1.1);
+          }
+        `}</style>
+
+        <div className="romantic-card max-w-md w-full bg-white/95 backdrop-blur-md p-8 sm:p-12 rounded-3xl shadow-2xl border-2 border-rose-100 relative overflow-hidden">
+          {/* Decorative corner elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-rose-100/40 to-transparent rounded-bl-full" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-pink-100/40 to-transparent rounded-tr-full" />
+          
+          <div className="relative z-10">
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full blur-xl opacity-50" />
+                <div className="shield-glow relative bg-gradient-to-br from-rose-400 via-pink-400 to-rose-500 p-4 rounded-full shadow-lg">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+            
+            <h2 className="romantic-title text-center text-4xl sm:text-5xl font-bold text-gray-800 mb-3">
               Create Account
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Admin registration - access restricted
+            <p className="text-center text-base sm:text-lg text-gray-600 mb-8 italic">
+              Admin registration only
             </p>
-          </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
+            <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+              <div className="space-y-5">
+                <div className="relative">
+                  <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2 tracking-wide">
+                    Username
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+                      <User className="h-5 w-5 text-gray-400 group-focus-within:text-rose-400 transition-colors" />
+                    </div>
+                    <input
+                      {...register('username')}
+                      type="text"
+                      className="input-field appearance-none block w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-2xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 bg-white/50 text-base"
+                      placeholder="Choose a username"
+                    />
                   </div>
-                  <input
-                    {...register('username')}
-                    type="text"
-                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                    placeholder="Choose a username"
-                  />
+                  {errors.username && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center animate-in slide-in-from-top-1">
+                      <span className="mr-1">•</span> {errors.username.message}
+                    </p>
+                  )}
                 </div>
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
-                )}
-              </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                <div className="relative">
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2 tracking-wide">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-rose-400 transition-colors" />
+                    </div>
+                    <input
+                      {...register('password')}
+                      type="password"
+                      className="input-field appearance-none block w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-2xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 bg-white/50 text-base"
+                      placeholder="Create a password"
+                    />
                   </div>
-                  <input
-                    {...register('password')}
-                    type="password"
-                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                    placeholder="Create a password"
-                  />
+                  {errors.password && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center animate-in slide-in-from-top-1">
+                      <span className="mr-1">•</span> {errors.password.message}
+                    </p>
+                  )}
                 </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                )}
-              </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                <div className="relative">
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2 tracking-wide">
+                    Confirm Password
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-rose-400 transition-colors" />
+                    </div>
+                    <input
+                      {...register('confirmPassword')}
+                      type="password"
+                      className="input-field appearance-none block w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-2xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 bg-white/50 text-base"
+                      placeholder="Confirm your password"
+                    />
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center animate-in slide-in-from-top-1">
+                      <span className="mr-1">•</span> {errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-3 bg-rose-50/50 p-4 rounded-2xl border-2 border-rose-100 hover:border-rose-200 transition-colors">
                   <input
-                    {...register('confirmPassword')}
-                    type="password"
-                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
-                    placeholder="Confirm your password"
+                    {...register('isAdmin')}
+                    type="checkbox"
+                    id="isAdmin"
+                    className="checkbox-custom w-5 h-5 rounded-lg border-2 border-rose-300 text-rose-500 focus:ring-rose-400 focus:ring-2 cursor-pointer"
                   />
+                  <label htmlFor="isAdmin" className="text-sm text-gray-700 font-medium cursor-pointer select-none">
+                    Grant admin privileges
+                  </label>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-                )}
               </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  {...register('isAdmin')}
-                  type="checkbox"
-                  id="isAdmin"
-                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                />
-                <label htmlFor="isAdmin" className="text-sm text-gray-700">
-                  Grant admin privileges
-                </label>
-              </div>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            >
-              {loading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2" />
-                  Creating account...
+              {error && (
+                <div className="bg-red-50 border-2 border-red-200 text-red-600 px-4 py-3 rounded-2xl text-sm font-medium animate-in slide-in-from-top-2">
+                  {error}
                 </div>
-              ) : (
-                'Register'
               )}
-            </button>
-          </form>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="group relative w-full flex justify-center py-4 px-6 border-2 border-transparent rounded-2xl text-white text-lg font-semibold bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500 hover:from-rose-500 hover:via-pink-500 hover:to-rose-600 focus:outline-none focus:ring-4 focus:ring-rose-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl shadow-lg"
+              >
+                {loading ? (
+                  <span className="flex items-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                    Creating account...
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Shield className="h-5 w-5 mr-2" />
+                    Register
+                  </span>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </>
