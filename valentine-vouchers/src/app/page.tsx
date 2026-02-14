@@ -332,7 +332,7 @@ export default function HomePage() {
                 <Gift className="h-8 w-8 text-rose-300" />
               </div>
               <p className="text-gray-600 mb-2 font-light">No treasures at the moment</p>
-              <p className="text-sm text-gray-400 font-light">New surprises are being prepared with love</p>
+              <p className="text-sm text-gray-400 font-light">New surprises are being prepared with hardwork</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">

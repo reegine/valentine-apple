@@ -12,11 +12,11 @@ interface SuccessPopupProps {
 }
 
 const romanticMessages = [
-  { text: "Love is in the air!", icon: Sparkles },
+  { text: "Romance is in the air!", icon: Sparkles },
   { text: "A beautiful memory begins...", icon: Camera },
   { text: "Sending you warm hugs!", icon: Heart },
   { text: "Sweet as honey!", icon: Coffee },
-  { text: "You deserve all the love!", icon: Star },
+  { text: "You deserve all the heartss!", icon: Star },
   { text: "Another chapter in your love story!", icon: Gift },
 ];
 

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "RR's Valentine",
-  description: "A gift of love and surprises for Rago - a collection of personalized vouchers to make this Valentine's Day unforgettable!",
+  description: "A gift of hearts and surprises for Rago - a collection of personalized vouchers to make this Valentine's Day unforgettable!",
    icons: {
     icon: [
       { url: '/logo/apple-icon.png' },

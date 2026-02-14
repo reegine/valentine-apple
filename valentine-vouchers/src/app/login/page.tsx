@@ -163,7 +163,7 @@ export default function LoginPage() {
                   </div>
                 ) : (
                   <div className="flex items-center">
-                    <span>Sign in with love</span>
+                    <span>Sign in</span>
                     <Heart className="h-4 w-4 ml-2 fill-white animate-pulse" />
                   </div>
                 )}
